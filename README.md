@@ -47,11 +47,11 @@ docker-compose up -d
 
 4. Launching migrations, collecting statics and creating a superuser:
 ```bash
-docker-compose exec web python manage.py migrate
+docker compose exec web python manage.py migrate
 
-docker-compose exec web python manage.py collectstatic --no-input
+docker compose exec web python manage.py collectstatic --no-input
 
-docker-compose exec web python manage.py
+docker compose exec web python manage.py
 ```
 
 Working with the project
