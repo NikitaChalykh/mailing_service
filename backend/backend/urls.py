@@ -9,7 +9,7 @@ schema_view = get_schema_view(
     openapi.Info(
         title="Parcer API",
         default_version='v1',
-        description="Documentation for the test task",
+        description="Mailing service",
         contact=openapi.Contact(email="Wizardus@list.ru"),
         license=openapi.License(name="BSD License"),
     ),
