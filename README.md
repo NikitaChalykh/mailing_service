@@ -1,4 +1,4 @@
-Notification mailing service to users
+Notification mailing service
 =====
 
 Project description
