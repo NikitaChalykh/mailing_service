@@ -1,22 +1,22 @@
-Сервис рассылки уведомлений пользователям
+Notification mailing service to users
 =====
 
-Описание проекта
+Project description
 ----------
-Проект представляет собой сервис для работы с данными клиентов и управления рассылками сообщений.
+The project is a service for working with customer data and managing message distribution.
 
-Проект разворачивается в пяти Docker контейнерах: web-приложение для админки и api, celery-приложение для рассылки, postgresql-база данных, redis-база данных, и nginx-сервер.
+The project is deployed in five Docker containers: a web application for the admin panel and API, a celery application for distribution, a postgresql database, a redis database, and an nginx server.
 
-Настроены модели для отображения в панели администратора.
+Models are configured for display in the admin panel.
 
-Системные требования
+System requirements
 ----------
 
 * Python 3.8+
 * Docker
 * Works on Linux
 
-Стек технологий
+Technology stack
 ----------
 
 * Python 3.8+
@@ -29,24 +29,24 @@
 * Сelery
 * Redis
 
-Установка проекта из репозитория
+Installing the project from the repository
 ----------
-1. Клонирование репозитория:
-```bash 
+1. Cloning the repository:
+```bash
 git clone git@github.com:NikitaChalykh/backend.git
 
-cd backend # Переходим в директорию с проектом
+cd backend # Go to the directory with the project
 ```
 
-2. Создайте файл ```.env``` используя ```env.example``` в качестве шаблона в папке infra
+2. Create a ```.env``` file using ```env.example``` as a template in the infra folder
 
-3. Установка и запуск сервиса в контейнере:
-```bash 
+3. Installing and running the service in the container:
+```bash
 docker-compose up -d
 ```
 
-4. Запуск миграций, сбор статики и создание суперпользователя:
-```bash 
+4. Launching migrations, collecting statics and creating a superuser:
+```bash
 docker-compose exec web python manage.py migrate
 
 docker-compose exec web python manage.py collectstatic --no-input
@@ -54,14 +54,14 @@ docker-compose exec web python manage.py collectstatic --no-input
 docker-compose exec web python manage.py
 ```
 
-Работа с проектом
+Working with the project
 ----------
-Документация по работе API сервиса:
+Documentation on the API service:
 
 ```http://127.0.0.1/redoc/```
 
 ```http://127.0.0.1/swagger/```
 
-Админка сервиса:
+Service admin panel:
 
 ```http://127.0.0.1/admin/```

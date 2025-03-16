@@ -11,7 +11,7 @@ class ContactSerializer(serializers.ModelSerializer):
     def validate_number(self, value):
         if str(value)[0] != '7':
             raise serializers.ValidationError(
-                'Введите номер в формате 7XXXXXXXXXX'
+                'Enter the number in the format 7XXXXXXXXXX'
             )
         return value
 

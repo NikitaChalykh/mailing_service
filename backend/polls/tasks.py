@@ -12,7 +12,7 @@ from mailings.models import Contact, Mailing, Message
 load_dotenv()
 
 logging.basicConfig(
-    format='%(asctime)s %(name)s %(levelname)s  %(message)s',
+    format="%(asctime)s %(name)s %(levelname)s  %(message)s",
     handlers=[logging.StreamHandler(sys.stdout)],
     level=logging.ERROR
 )
@@ -21,69 +21,79 @@ logger.setLevel(logging.DEBUG)
 
 RETRY_TIME = 10
 TIME_FORMAT = "%Y-%m-%d - %H:%M:%S"
-SENDING_API_TOKEN = os.getenv('SENDING_API_TOKEN')
+SENDING_API_TOKEN = os.getenv("SENDING_API_TOKEN")
 
 
 class MissingValueException(Exception):
-    """Создаем свое исключения при отсутствии переменных окружения."""
+    """
+    Custom exception for missing environment variables.
+    """
 
 
 class GetAPIException(Exception):
-    """Создаем свое исключение при сбое запроса к API отправки сообщений."""
+    """
+    Custom exception for API request failures.
+    """
 
 
 def send_api_message(message_id, contact, message):
-    """Отправляем сообщение через внешнее API"""
-    headers = {'Authorization': f'Bearer {SENDING_API_TOKEN}'}
+    """
+    Send a message via an external API.
+    """
+
+    headers = {"Authorization": f"Bearer {SENDING_API_TOKEN}"}
     json = {
         "phone": contact,
         "text": message
     }
     try:
         response = requests.post(
-            f'https://probe.fbrq.cloud/v1/send/{message_id}'.format(
+            f"https://probe.fbrq.cloud/v1/send/{message_id}".format(
                 message_id=message_id
             ),
             headers=headers,
             json=json
         )
-        logger.info('Сообщение отправлено через венешний API')
+        logger.info("Message sent via external API")
         if response.status_code == 200:
             return True
         else:
             return False
     except Exception as error:
-        logger.error(f'Сбой при отправке сообщения: {error}')
+        logger.error(f"Message sending failure: {error}")
         return False
 
 
 def start_mailings():
-    """Основной код обработки рассылок."""
-    logger.debug('-----------------')
+    """
+    Main logic for processing mailings.
+    """
+
+    logger.debug("-----------------")
     message_id = [1]
     finished_mailing_id = []
     if SENDING_API_TOKEN is None:
-        logger.critical('Отсутствуют переменные окружения!')
-        raise MissingValueException('Отсутствуют переменные окружения!')
+        logger.critical("Missing environment variables!")
+        raise MissingValueException("Missing environment variables!")
     while True:
         try:
-            logger.debug('Начало новой иттерации')
+            logger.debug("Starting new iteration")
             mailings = Mailing.objects.all()
             for mailing in mailings:
                 current_datetime = datetime.now()
                 if (
                     datetime.strptime(
-                        mailing['start_send_time'], TIME_FORMAT
+                        mailing["start_send_time"], TIME_FORMAT
                     ) <= current_datetime
                     and datetime.strptime(
-                        mailing['end_send_time'], TIME_FORMAT
+                        mailing["end_send_time"], TIME_FORMAT
                     ) >= current_datetime
-                    and mailing['id'] not in finished_mailing_id
+                    and mailing["id"] not in finished_mailing_id
                 ):
-                    mailing_id = mailing['id']
-                    tag = mailing['tag']
-                    code = mailing['code']
-                    text = mailing['text']
+                    mailing_id = mailing["id"]
+                    tag = mailing["tag"]
+                    code = mailing["code"]
+                    text = mailing["text"]
                     contacts = Contact.objects.filter(
                         tag=tag
                     ).filter(
@@ -91,10 +101,10 @@ def start_mailings():
                     )
                     for contact in contacts:
                         current_datetime = datetime.now()
-                        contact_id = contact['id']
+                        contact_id = contact["id"]
                         if (
                             current_datetime <= datetime.strptime(
-                                mailing['end_send_time'], TIME_FORMAT
+                                mailing["end_send_time"], TIME_FORMAT
                             ) and send_api_message(
                                 message_id[0],
                                 contact,
@@ -102,22 +112,22 @@ def start_mailings():
                             )
                         ):
                             Message.objects.create(
-                                status='S',
+                                status="S",
                                 mailing=mailing_id,
                                 contact=contact_id
                             )
                         else:
                             Message.objects.create(
-                                status='N',
+                                status="N",
                                 mailing=mailing_id,
                                 contact=contact_id
                             )
                         message_id[0] += 1
                     finished_mailing_id.append(mailing_id)
-            logger.debug('Конец иттерации')
-            logger.debug('-----------------')
+            logger.debug("End of iteration")
+            logger.debug("-----------------")
             time.sleep(RETRY_TIME)
         except Exception as error:
-            logger.error(f'Сбой в работе программы: {error}')
-            logger.debug('-----------------')
+            logger.error(f"Program failure: {error}")
+            logger.debug("-----------------")
             time.sleep(RETRY_TIME)
