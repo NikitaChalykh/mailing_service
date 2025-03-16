@@ -42,7 +42,7 @@ cd backend # Go to the directory with the project
 
 3. Installing and running the service in the container:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 4. Launching migrations, collecting statics and creating a superuser:
